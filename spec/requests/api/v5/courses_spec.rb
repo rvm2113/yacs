@@ -18,6 +18,8 @@ def json_validate_courses(courses=@courses, sections=false, periods=false)
   end
 end
 
+
+
 describe 'Courses API' do
   context "there are departments with courses with sections" do
     before do
@@ -68,7 +70,8 @@ describe 'Courses API' do
       json_validate_courses(Course.all, true, true)
     end
   end
-
+  context 'User must be authenticated' do
+  @api_key = FactoryGirl.create(:api_key)
   context 'There is a course to be created' do
     it 'creates a course' do
       department = FactoryGirl.create(:department)
@@ -80,9 +83,10 @@ describe 'Courses API' do
           max_credits: 4,
           description: 'XXXXXX',
           department_id: department.id
-        }
+        },
       }
-      post "/api/v5/courses/", course_params
+      #request[:api_key] = @api_key
+      post "/api/v5/courses/", course_params,  headers: {authorization: "Token token=#{@api_key}"}
       expect(response).to be_success
       created_course=Course.find_by(name: 'Principles of Software', number: 2600)
       expect(created_course).to be_present
@@ -129,4 +133,5 @@ describe 'Courses API' do
     end
 
   end
+end
 end

@@ -10,6 +10,7 @@ class Api::V5::ApiController < ActionController::Metal
   include ActionController::Head
   include ActionController::Rescue
   include ActionController::Redirecting
+  include ActionController::HttpAuthentication::Token::ControllerMethods
   
   append_view_path "#{Rails.root}/app/views"
 
@@ -18,6 +19,7 @@ class Api::V5::ApiController < ActionController::Metal
   self.cache_store = :dalli_store
   
   before_filter :nested_queries, only: [:index]
+  before_action :authenticate, only: [:create, :update, :destroy]
 
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
 
@@ -30,6 +32,12 @@ class Api::V5::ApiController < ActionController::Metal
   end
 
   protected
+  def authenticate
+    authenticate_or_request_with_http_token do |token, options|
+      ApiKey.find_by(token: token)
+    end
+  end  
+
   def query
     @query
   end

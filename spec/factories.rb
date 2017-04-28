@@ -23,7 +23,7 @@ FactoryGirl.define do
       end
     end
   end
-
+  
 
 =begin
 [0, 2, 4]
@@ -91,4 +91,6 @@ should be zero.
       end
     end
   end
+
+  factory :api_key
 end
